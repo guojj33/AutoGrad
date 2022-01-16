@@ -1,13 +1,17 @@
 #include "Float.h"
 
 int main () {
-  Float a(1.0), b(2.0), c(3.0);
+  Float a(1.0), b(2.0), c(3.0); // Float含有指向_Float的指针。Float构造时会new一个_Float，当Float销毁时，_Float仍会保留。
   cout << "start of cycle\n";
   for (int i = 0; i < 1; ++i) {
     Float d = sigmoid(a*b+c);
+
     cout << "start of backward\n";
-    d.backward(); // 计算图中中间变量（a*b和（a*b+c））的_Float和GradVar将被释放，d的GradVar的GradOp被释放
+    d.backward(); 
+    /* 启动反向传播。计算图中的中间变量（a*b和（a*b+c））的_Float及其GradVar及其GradOp都将被释放，
+    而d只有其_Float的GradVar的GradOp被释放。*/
     cout << "end of backward\n";
+    
     a.printGradient();
     b.printGradient();
     c.printGradient();
