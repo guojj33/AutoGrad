@@ -25,13 +25,26 @@ void global_grad_cal() {
 }
 
 class GradVar {
-/* 一个GradVar与一个_Float对应，记录其梯度值，以及_Float是由哪个GradOp对应的正向操作计算出来的 */
+/* 一个GradVar与一个_Float对应，记录其梯度值 */
 public:
-  float data = 0;
-  GradOp * grad_op = nullptr;
+  float data = 0; // 梯度值
+  GradOp * grad_op = nullptr; // GradVar对应的_Float是由此grad_op对应的正向运算计算出来的
+  float depend_count = 0; // 输入中包含此_Float的正向“运算”的个数，_Float的完整梯度的计算依赖于这些“运算”
 
   GradVar() {
     // cout << typeid(*this).name() << " " << this << " is being created.\n";
+  }
+
+  void increase_depend_count() {
+    depend_count += 1;
+  }
+
+  void decrease_depend_count() {
+    depend_count -= 1;
+  }
+
+  bool is_gradient_complete () {
+    return depend_count == 0;
   }
 
   void delete_grad_op () {
@@ -63,6 +76,25 @@ public:
     this->data = d;
     cout << typeid(*this).name() << " " << this << " is being created.";
     cout << " data=" << this->data << ".\n";
+  }
+
+  void increase_grad_depend_count() {
+    if (grad != nullptr) {
+      grad->increase_depend_count();
+    }
+  }
+
+  void decrease_grad_depend_count() {
+    if (grad != nullptr) {
+      grad->decrease_depend_count();
+    }
+  }
+
+  bool is_grad_complete() {
+    if (grad != nullptr) {
+      return grad->is_gradient_complete();
+    }
+    return false;
   }
 
   ~_Float() {
@@ -102,7 +134,7 @@ public:
 
 queue<_Float *> global__Float_to_delete;
 
-void global__Float_clear() {  
+void global__Float_clear() {
   // 正向计算图中入度大于等于1的都被释放
   while(!global__Float_to_delete.empty()) {
     _Float * f = global__Float_to_delete.front();
@@ -134,12 +166,14 @@ public:
   void run() override {
     if (!a->stop_grad) {
       update_a_grad();
-      if (a->grad->grad_op != nullptr)
+      a->decrease_grad_depend_count();
+      if (a->grad->grad_op != nullptr && a->is_grad_complete())
         global_grad_pending_ops.push(a->grad->grad_op);
     }
     if (!b->stop_grad) {
       update_b_grad();
-      if (b->grad->grad_op != nullptr)
+      b->decrease_grad_depend_count();
+      if (b->grad->grad_op != nullptr && b->is_grad_complete())
         global_grad_pending_ops.push(b->grad->grad_op);
     }
     global__Float_to_delete.push(c);
@@ -165,6 +199,8 @@ public:
 };
 
 _Float& operator+(_Float &a, _Float &b) {
+  a.increase_grad_depend_count();
+  b.increase_grad_depend_count();
   _Float * c = new _Float(a.data+b.data);
   AddBackward * add_op = new AddBackward(&a, &b, c);
   c->grad->grad_op = (GradOp*)add_op;
@@ -190,6 +226,8 @@ public:
 };
 
 _Float& operator-(_Float &a, _Float &b) {
+  a.increase_grad_depend_count();
+  b.increase_grad_depend_count();
   _Float * c = new _Float(a.data-b.data);
   SubBackward * sub_op = new SubBackward(&a, &b, c);
   c->grad->grad_op = (GradOp*)sub_op;
@@ -215,6 +253,8 @@ public:
 };
 
 _Float& operator*(_Float &a, _Float &b) {
+  a.increase_grad_depend_count();
+  b.increase_grad_depend_count();
   _Float * c = new _Float(a.data*b.data);
   MulBackward * mul_op = new MulBackward(&a, &b, c);
   c->grad->grad_op = (GradOp*)mul_op;
@@ -242,7 +282,8 @@ public:
   void run() override {
     if (!x->stop_grad) {
       update_x_grad();
-      if (x->grad->grad_op != nullptr) {
+      x->decrease_grad_depend_count();
+      if (x->grad->grad_op != nullptr && x->is_grad_complete()) {
         global_grad_pending_ops.push(x->grad->grad_op);
       }
     }
@@ -265,6 +306,7 @@ public:
 };
 
 _Float& sigmoid(_Float &x) {
+  x.increase_grad_depend_count();
   float y_data = 1.0/(1+exp(-x.data));
   _Float * y = new _Float(y_data);
   SigmoidBackward * sigmoid_op = new SigmoidBackward(&x, y);
@@ -291,6 +333,7 @@ public:
 };
 
 _Float& pow(_Float &x, float a) {
+  x.increase_grad_depend_count();
   float y_data = pow(x.data, a);
   _Float * y = new _Float(y_data);
   PowBackward * pow_op = new PowBackward(&x, y, a);
