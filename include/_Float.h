@@ -97,17 +97,13 @@ public:
   friend _Float& operator-(_Float &a, _Float &b);
   friend _Float& operator*(_Float &a, _Float &b);
   friend _Float& sigmoid(_Float &x);
+  friend _Float& pow(_Float &x, float a);
 };
 
 queue<_Float *> global__Float_to_delete;
 
-void global__Float_clear() {
-  _Float *front = global__Float_to_delete.front();
-  global__Float_to_delete.pop();
-  front->grad->delete_grad_op(); // 释放方向传播其实点的GradOp，但不释放_Float本身和GradVar
-  cout << "front of queue: " << front << "\n";
-  
-  // 释放中间变量_Float、GradVar、GradOp
+void global__Float_clear() {  
+  // 正向计算图中入度大于等于1的都被释放
   while(!global__Float_to_delete.empty()) {
     _Float * f = global__Float_to_delete.front();
     global__Float_to_delete.pop();
@@ -273,5 +269,31 @@ _Float& sigmoid(_Float &x) {
   _Float * y = new _Float(y_data);
   SigmoidBackward * sigmoid_op = new SigmoidBackward(&x, y);
   y->grad->grad_op = (GradOp*)sigmoid_op;
+  return *y;
+}
+
+class PowBackward: UnaryOp {
+/* y = x^a */
+public:
+  float a;
+
+  PowBackward(_Float *x, _Float *y, float a) : UnaryOp(x, y) {
+    this->a = a;
+  }
+
+  void update_x_grad() override {
+    x->grad->data += a*pow(x->data, a-1);
+  }
+
+  ~PowBackward() {
+    cout << typeid(*this).name() << " " << this << " is being deleted.\n";
+  }
+};
+
+_Float& pow(_Float &x, float a) {
+  float y_data = pow(x.data, a);
+  _Float * y = new _Float(y_data);
+  PowBackward * pow_op = new PowBackward(&x, y, a);
+  y->grad->grad_op = (GradOp*)pow_op;
   return *y;
 }
