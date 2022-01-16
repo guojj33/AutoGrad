@@ -113,10 +113,10 @@ public:
 
   void printGradient() {
     if (!stop_grad) {
-      cout << grad->data << "\n";
+      cout << grad->data;
     }
     else {
-      cout << "none\n";
+      cout << "none";
     }
   }
 

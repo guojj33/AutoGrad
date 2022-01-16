@@ -37,6 +37,7 @@ public:
 
   void printGradient() {
     data->printGradient();
+    cout << "\n";
   }
 
   void backward() {
