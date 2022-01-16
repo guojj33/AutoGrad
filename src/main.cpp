@@ -1,10 +1,16 @@
 #include "Float.h"
 
+float sigmoid(float x) {
+  return 1.0/(1+exp(-x));
+}
+
 int main () {
   Float a(1.0), b(2.0), c(3.0); // Float含有指向_Float的指针。Float构造时会new一个_Float，当Float销毁时，_Float仍会保留。
   cout << "start of cycle\n";
   for (int i = 0; i < 1; ++i) {
-    Float d = sigmoid(a*b+c);
+    Float d = sigmoid(a*b-c);
+    cout << "forward = " << d.value() << "\n";
+    cout << "expect = " << sigmoid(1*2-3) << "\n";
 
     cout << "start of backward\n";
     d.backward(); 

@@ -5,6 +5,7 @@
 using namespace std;
 
 class GradOp {
+/* GradOp 在正向运算时被创建，在反向传播时run会被调用以计算梯度 */
 public:
   virtual void run() = 0;
   virtual ~GradOp() {};
@@ -24,6 +25,7 @@ void global_grad_cal() {
 }
 
 class GradVar {
+/* 一个GradVar与一个_Float对应，记录其梯度值，以及_Float是由哪个GradOp对应的正向操作计算出来的 */
 public:
   float data = 0;
   GradOp * grad_op = nullptr;
@@ -91,8 +93,9 @@ public:
     }
   }
 
-  friend _Float& operator*(_Float &a, _Float &b);
   friend _Float& operator+(_Float &a, _Float &b);
+  friend _Float& operator-(_Float &a, _Float &b);
+  friend _Float& operator*(_Float &a, _Float &b);
   friend _Float& sigmoid(_Float &x);
 };
 
@@ -128,54 +131,36 @@ public:
     this->c = c;
     this->c_grad = c->grad;
   }
-};
 
-class MulBackward : BinaryOp {
-public:
-  MulBackward(_Float *a, _Float *b, _Float *c) : BinaryOp(a, b, c) {}
+  virtual void update_a_grad() = 0;
+  virtual void update_b_grad() = 0;
 
-  void run() {
+  void run() override {
     if (!a->stop_grad) {
-      a->grad->data += c_grad->data * b->data;
+      update_a_grad();
       if (a->grad->grad_op != nullptr)
         global_grad_pending_ops.push(a->grad->grad_op);
     }
     if (!b->stop_grad) {
-      b->grad->data += c_grad->data * a->data;
+      update_b_grad();
       if (b->grad->grad_op != nullptr)
         global_grad_pending_ops.push(b->grad->grad_op);
     }
     global__Float_to_delete.push(c);
   }
-
-  ~MulBackward() {
-    cout << typeid(*this).name() << " " << this << " is being deleted.\n";
-  }
 };
 
-_Float& operator*(_Float &a, _Float &b) {
-  _Float * c = new _Float(a.data*b.data);
-  MulBackward * mul_op = new MulBackward(&a, &b, c);
-  c->grad->grad_op = (GradOp*)mul_op;
-  return *c;
-}
-
 class AddBackward : BinaryOp {
+/* c = a + b */
 public:
   AddBackward(_Float *a, _Float *b, _Float *c) : BinaryOp(a, b, c) {}
 
-  void run() {
-    if (!a->stop_grad) {
-      a->grad->data += c_grad->data*1;
-      if (a->grad->grad_op != nullptr)
-        global_grad_pending_ops.push(a->grad->grad_op);
-    }
-    if (!b->stop_grad) {
-      b->grad->data += c_grad->data*1;
-      if (b->grad->grad_op != nullptr)
-        global_grad_pending_ops.push(b->grad->grad_op);
-    }
-    global__Float_to_delete.push(c);
+  void update_a_grad() override {
+    a->grad->data += c_grad->data*1;
+  }
+
+  void update_b_grad() override {
+    b->grad->data += c_grad->data*1;
   }
 
   ~AddBackward() {
@@ -190,24 +175,92 @@ _Float& operator+(_Float &a, _Float &b) {
   return *c;
 }
 
-class SigmoidBackward : GradOp {
+class SubBackward : BinaryOp {
+/* c = a - b */
 public:
-  _Float *x;
-  _Float *y;
+  SubBackward(_Float *a, _Float *b, _Float *c) : BinaryOp(a, b, c) {}
 
-  SigmoidBackward(_Float *x, _Float *y) {
-    this->x = x;
-    this->y = y;
+  void update_a_grad() override {
+    a->grad->data += c_grad->data*1;
   }
 
-  void run() {
+  void update_b_grad() override {
+    b->grad->data += c_grad->data*(-1);
+  }
+  
+  ~SubBackward() {
+    cout << typeid(*this).name() << " " << this << " is being deleted.\n";
+  }
+};
+
+_Float& operator-(_Float &a, _Float &b) {
+  _Float * c = new _Float(a.data-b.data);
+  SubBackward * sub_op = new SubBackward(&a, &b, c);
+  c->grad->grad_op = (GradOp*)sub_op;
+  return *c;
+}
+
+class MulBackward : BinaryOp {
+/* c = a * b */
+public:
+  MulBackward(_Float *a, _Float *b, _Float *c) : BinaryOp(a, b, c) {}
+
+  void update_a_grad() override {
+    a->grad->data += c_grad->data * b->data;
+  }
+
+  void update_b_grad() override {
+    b->grad->data += c_grad->data * a->data;
+  }
+
+  ~MulBackward() {
+    cout << typeid(*this).name() << " " << this << " is being deleted.\n";
+  }
+};
+
+_Float& operator*(_Float &a, _Float &b) {
+  _Float * c = new _Float(a.data*b.data);
+  MulBackward * mul_op = new MulBackward(&a, &b, c);
+  c->grad->grad_op = (GradOp*)mul_op;
+  return *c;
+}
+
+class UnaryOp : GradOp {
+public:
+  // input
+  _Float *x;
+  GradVar *y_grad;
+  // output
+  // GradVar *x_grad;
+
+  _Float *y;
+
+  UnaryOp(_Float *x, _Float *y) {
+    this->x = x;
+    this->y = y;
+    this->y_grad = y->grad;
+  }
+
+  virtual void update_x_grad() = 0;
+
+  void run() override {
     if (!x->stop_grad) {
-      x->grad->data += y->grad->data*(y->data)*(1-y->data);
+      update_x_grad();
       if (x->grad->grad_op != nullptr) {
         global_grad_pending_ops.push(x->grad->grad_op);
       }
     }
     global__Float_to_delete.push(y);
+  }
+};
+
+class SigmoidBackward : UnaryOp {
+/* y = sigmoid(x) */
+public:
+  SigmoidBackward(_Float *x, _Float *y) : UnaryOp(x, y) {}
+
+  void update_x_grad() override {
+    x->grad->data += y_grad->data*(y->data)*(1-y->data);
   }
 
   ~SigmoidBackward() {
