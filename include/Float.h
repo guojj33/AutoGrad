@@ -4,6 +4,11 @@ class Float {
 public:
   _Float *data = nullptr;
 
+  Float() {
+    data = new _Float(0, false);
+    cout << typeid(*this).name() << " " << this << " is being created.\n";
+  }
+
   Float(float d, bool stop_gradient=false) {
     data = new _Float(d, stop_gradient);
     // cout << typeid(*this).name() << " " << this << " is being created.\n";
@@ -15,7 +20,13 @@ public:
   }
 
   ~Float() {
-    // cout << typeid(*this).name() << " " << this << " is being deleted.\n";
+    cout << typeid(*this).name() << " " << this << " is being deleted.\n";
+  }
+
+  void setValue(float d) {
+    if (data != nullptr) {
+      data->data = d;
+    }
   }
 
   void clear() {

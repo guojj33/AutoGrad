@@ -69,6 +69,11 @@ public:
   GradVar * grad = nullptr;
   bool stop_grad = false;
 
+  _Float() {
+    grad = new GradVar();
+    cout << typeid(*this).name() << " " << this << " is being created with _Float().\n";
+  }
+
   _Float(float d, bool stop_grad=false) {
     this->stop_grad = stop_grad;
     if (!stop_grad)
