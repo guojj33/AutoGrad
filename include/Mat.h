@@ -1,3 +1,6 @@
+#ifndef MAT_H
+#define MAT_H
+
 #include "Float.h"
 #include <vector>
 using namespace std;
@@ -126,3 +129,5 @@ Mat operator-(const Mat& mat1, const Mat& mat2) {
   }
   return mat3;
 }
+
+#endif

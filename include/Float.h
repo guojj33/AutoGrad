@@ -1,3 +1,6 @@
+#ifndef FLOAT_H
+#define FLOAT_H
+
 #include "_Float.h"
 
 class Float {
@@ -81,3 +84,5 @@ Float pow(const Float &x, float a) {
   _Float *y_data = &(pow(*x.data, a));
   return Float(y_data);
 }
+
+#endif

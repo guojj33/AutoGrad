@@ -1,3 +1,6 @@
+#ifndef _FLOAT_H
+#define _FLOAT_H
+
 #include <queue>
 #include <cmath>
 #include <iostream>
@@ -345,3 +348,5 @@ _Float& pow(_Float &x, float a) {
   y->grad->grad_op = (GradOp*)pow_op;
   return *y;
 }
+
+#endif

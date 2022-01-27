@@ -1,3 +1,4 @@
+#include "Float.h"
 #include "Mat.h"
 
 void test1 () {
