@@ -35,7 +35,7 @@ public:
   float depend_count = 0; // 输入中包含此_Float的正向“运算”的个数，_Float的完整梯度的计算依赖于这些“运算”
 
   GradVar() {
-    // cout << typeid(*this).name() << " " << this << " is being created.\n";
+    // //cout << typeid(*this).name() << " " << this << " is being created.\n";
   }
 
   void increase_depend_count() {
@@ -58,7 +58,7 @@ public:
   }
 
   ~GradVar() {
-    cout << typeid(*this).name() << " " << this << " is being deleted.\n";
+    //cout << typeid(*this).name() << " " << this << " is being deleted.\n";
     if (grad_op != nullptr) {
       delete grad_op;
       grad_op = nullptr;
@@ -74,7 +74,7 @@ public:
 
   _Float() {
     grad = new GradVar();
-    cout << typeid(*this).name() << " " << this << " is being created with _Float().\n";
+    //cout << typeid(*this).name() << " " << this << " is being created with _Float().\n";
   }
 
   _Float(float d, bool stop_grad=false) {
@@ -82,8 +82,8 @@ public:
     if (!stop_grad)
       grad = new GradVar();
     this->data = d;
-    cout << typeid(*this).name() << " " << this << " is being created.";
-    cout << " data=" << this->data << ".\n";
+    //cout << typeid(*this).name() << " " << this << " is being created.";
+    //cout << " data=" << this->data << ".\n";
   }
 
   void increase_grad_depend_count() {
@@ -106,8 +106,8 @@ public:
   }
 
   ~_Float() {
-    cout << typeid(*this).name() << " " << this << " is being deleted.";
-    cout << " data=" << this->data << ".\n";
+    //cout << typeid(*this).name() << " " << this << " is being deleted.";
+    //cout << " data=" << this->data << ".\n";
     if (grad != nullptr) {
       delete grad;
       grad = nullptr;
@@ -202,7 +202,7 @@ public:
   }
 
   ~AddBackward() {
-    cout << typeid(*this).name() << " " << this << " is being deleted.\n";
+    //cout << typeid(*this).name() << " " << this << " is being deleted.\n";
   }
 };
 
@@ -229,7 +229,7 @@ public:
   }
   
   ~SubBackward() {
-    cout << typeid(*this).name() << " " << this << " is being deleted.\n";
+    //cout << typeid(*this).name() << " " << this << " is being deleted.\n";
   }
 };
 
@@ -256,7 +256,7 @@ public:
   }
 
   ~MulBackward() {
-    cout << typeid(*this).name() << " " << this << " is being deleted.\n";
+    //cout << typeid(*this).name() << " " << this << " is being deleted.\n";
   }
 };
 
@@ -309,7 +309,7 @@ public:
   }
 
   ~SigmoidBackward() {
-    cout << typeid(*this).name() << " " << this << " is being deleted.\n";
+    //cout << typeid(*this).name() << " " << this << " is being deleted.\n";
   }
 };
 
@@ -336,7 +336,7 @@ public:
   }
 
   ~PowBackward() {
-    cout << typeid(*this).name() << " " << this << " is being deleted.\n";
+    //cout << typeid(*this).name() << " " << this << " is being deleted.\n";
   }
 };
 

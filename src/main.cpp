@@ -21,37 +21,54 @@ void test1 () {
   }
   cout << "end of cycle\n";
   // 手动释放资源
-  a.clear(); 
+  a.clear();
   /* 为什么不让_Float随Float销毁而释放？ 
   如果那样实现，那么（a*b）产生的中间变量在语句结束后会被销毁？这样下一步执行backward时就会出错？ */
 }
 
 void test2() {
-  Mat m1(1,2);
-  m1.set(0, 0, 1);
-  m1.set(0, 1, 2);
-  m1.printMat();
+  Mat x(2,2); // [[x1, x2], [1, 1]]
+  x.set(0, 0, 1); // x1=1
+  x.set(1, 0, 1);
+  x.set(0, 1, 0); // x2=0
+  x.set(1, 1, 1);
+  cout << "x:\n";
+  x.printMat();
 
-  Mat m2(1,2);
-  m2.set(0, 0, 2);
-  m2.set(0, 1, 3);
-  m2.printMat();
+  Mat label(2,1); // [[label1], [label2]]
+  label.set(0, 0, 2); // label1=2
+  label.set(1, 0, 1); // label2=1
+  cout << "label:\n";
+  label.printMat();
 
-  Mat m3 = m1-m2+m1;
-  m3.printMat();
+  Mat w(2,1); // [[w1], [1]]
+  w.set(0, 0, 0.5);
+  w.set(1, 0, 0.5);
+  cout << "w:\n";
+  w.printMat();
+  w.transpose().printMat(); // [[w, b]]
+  Mat y = w.transpose() * x;  // [[y1, y2]] = [[w*x1+b, w*x2+b]]
+  cout << "y:\n";
+  y.printMat();
+  Mat diff = y.transpose() - label;
+  cout << "diff:\n";
+  diff.printMat();
+  Mat se_loss = diff.transpose() * diff;
+  cout << "se:\n";
+  se_loss.printMat();
   cout << "start of backward\n";
-  m3.backward();
+  se_loss.backward();
   cout << "end of backward\n";
   
-  m1.printGradient(); // 2  2
-  m2.printGradient(); // -1 -1
+  x.printGradient();
+  w.printGradient();
 
-  m1.clear();
-  m2.clear();
+  x.clear();
+  w.clear();
 }
 
 int main () {
-  test1();
-  cout << "\n";
+  // test1();
+  // cout << "\n";
   test2();
 }
