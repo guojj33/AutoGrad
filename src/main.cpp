@@ -27,15 +27,16 @@ void test1 () {
 }
 
 void test2() {
-  Mat x(2,2); // [[x1, x2], [1, 1]]
+  Mat x(2, 2, true); // [[x1, x2], [1, 1]]
   x.set(0, 0, 1); // x1=1
   x.set(1, 0, 1);
   x.set(0, 1, 0); // x2=0
   x.set(1, 1, 1);
   cout << "x:\n";
   x.printMat();
+  x.printGradient();
 
-  Mat label(2,1); // [[label1], [label2]]
+  Mat label(2, 1, true); // [[label1], [label2]]
   label.set(0, 0, 2); // label1=2
   label.set(1, 0, 1); // label2=1
   cout << "label:\n";
@@ -46,7 +47,7 @@ void test2() {
   w.set(1, 0, 0.5);
   float learing_rate = 0.01;
 
-  for (int epoch = 0; epoch < 100; ++epoch) {
+  for (int epoch = 0; epoch < 10; ++epoch) {
     printf("--------------epoch %d-------------\n", epoch);
     cout << "w:\n";
     w.transpose().printMat(); // [[w, b]]

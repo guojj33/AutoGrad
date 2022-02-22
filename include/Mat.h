@@ -17,14 +17,14 @@ private:
 
 public:
 
-  Mat (int row, int col) {
+  Mat (int row, int col, bool stop_grad=false) {
     cout << typeid(*this).name() << " " << this << " is being created.\n";
     this->row = row;
     this->col = col;
     for (int i = 0; i < row; ++i) {
       vector<_Float*> rdata;
       for (int j = 0; j < col; ++j) {
-        _Float * p = new _Float();
+        _Float * p = new _Float(stop_grad);
         rdata.push_back(p);
       }
       data.push_back(rdata);
@@ -220,8 +220,19 @@ Mat operator/(const Mat& mat1, const float a) {
   return mat1 * (1.0/a);
 }
 
-Mat sigmoid(const Mat&) {
-  
+Mat sigmoid(const Mat& mat1) {
+  Mat mat2;
+  mat2.row = mat1.row;
+  mat2.col = mat1.col;
+  for (int i = 0; i < mat2.row; ++i) {
+    vector<_Float*> rdata;
+    for (int j = 0; j < mat2.col; ++j) {
+      _Float *p = &(sigmoid(*mat1.data[i][j]));
+      rdata.push_back(p);
+    }
+    mat2.data.push_back(rdata);
+  }
+  return mat2;
 }
 
 #endif

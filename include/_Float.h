@@ -72,8 +72,9 @@ public:
   GradVar * grad = nullptr;
   bool stop_grad = false;
 
-  _Float() {
+  _Float(bool stop_grad=false) {
     grad = new GradVar();
+    this->stop_grad = stop_grad;
     //cout << typeid(*this).name() << " " << this << " is being created with _Float().\n";
   }
 
