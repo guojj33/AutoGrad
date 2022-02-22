@@ -44,24 +44,27 @@ void test2() {
   Mat w(2,1); // [[w1], [1]]
   w.set(0, 0, 0.5);
   w.set(1, 0, 0.5);
-  cout << "w:\n";
-  w.printMat();
-  w.transpose().printMat(); // [[w, b]]
-  Mat y = w.transpose() * x;  // [[y1, y2]] = [[w*x1+b, w*x2+b]]
-  cout << "y:\n";
-  y.printMat();
-  Mat diff = y.transpose() - label;
-  cout << "diff:\n";
-  diff.printMat();
-  Mat se_loss = diff.transpose() * diff;
-  cout << "se:\n";
-  se_loss.printMat();
-  cout << "start of backward\n";
-  se_loss.backward();
-  cout << "end of backward\n";
-  
-  x.printGradient();
-  w.printGradient();
+  float learing_rate = 0.01;
+
+  for (int epoch = 0; epoch < 100; ++epoch) {
+    printf("--------------epoch %d-------------\n", epoch);
+    cout << "w:\n";
+    w.transpose().printMat(); // [[w, b]]
+    Mat y = w.transpose() * x;  // [[y1, y2]] = [[w*x1+b, w*x2+b]]
+    cout << "y:\n";
+    y.printMat();
+    Mat diff = y.transpose() - label;
+    Mat se_loss = diff.transpose() * diff;
+    se_loss = se_loss/2;
+    cout << "se_loss:\n";
+    se_loss.printMat();
+    cout << "start of backward\n";
+    se_loss.backward();
+    cout << "end of backward\n";
+    
+    // w.printGradient();
+    w.update(learing_rate);
+  }
 
   x.clear();
   w.clear();

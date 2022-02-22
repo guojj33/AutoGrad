@@ -49,7 +49,7 @@ public:
   }
 
   ~Mat () {
-    cout << typeid(*this).name() << " " << this << " is being deleted.\n";
+    // cout << typeid(*this).name() << " " << this << " is being deleted.\n";
   }
 
   void printMat() {
@@ -92,6 +92,15 @@ public:
     }
   }
 
+  void update(float learning_rate) {
+    for (int i = 0; i < row; ++i) {
+      for (int j = 0; j < col; ++j) {
+        float new_data = data[i][j]->data - data[i][j]->grad->data * learning_rate;
+        data[i][j]->data = new_data;
+      }
+    }
+  }
+
   void clear() {
     for (int i = 0; i < row; ++i) {
       for (int j = 0; j < col; ++j) {
@@ -121,6 +130,8 @@ public:
   friend Mat operator*(const Mat& mat1, const Mat & mat2);
   friend Mat operator*(const Mat& mat1, const float a);
   friend Mat operator*(const float a, const Mat& mat1);
+  friend Mat operator/(const Mat& mat1, const float a);
+  friend Mat sigmoid(const Mat&mat1);
 };
 
 Mat operator+(const Mat& mat1, const Mat& mat2) {
@@ -186,11 +197,31 @@ Mat operator*(const Mat& mat1, const Mat &mat2) {
 
 
 Mat operator*(const Mat& mat1, const float a) {
-
+  _Float *ap = new _Float(a, true);
+  Mat mat2;
+  mat2.row = mat1.row;
+  mat2.col = mat1.col;
+  for (int i = 0; i < mat2.row; ++i) {
+    vector<_Float*> rdata;
+    for (int j = 0; j < mat2.col; ++j) {
+      _Float *p = &(*mat1.data[i][j] * *ap);
+      rdata.push_back(p);
+    }
+    mat2.data.push_back(rdata);
+  }
+  return mat2;
 }
 
 Mat operator*(const float a, const Mat& mat1) {
+  return mat1 * a;
+}
 
+Mat operator/(const Mat& mat1, const float a) {
+  return mat1 * (1.0/a);
+}
+
+Mat sigmoid(const Mat&) {
+  
 }
 
 #endif
