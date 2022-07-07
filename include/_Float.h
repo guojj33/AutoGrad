@@ -270,6 +270,42 @@ _Float& operator*(_Float &a, _Float &b) {
   return *c;
 }
 
+class DivBackward : BinaryOp {
+/* c = a / b  */
+public:
+  DivBackward(_Float *a, _Float *b, _Float *c) : BinaryOp(a, b, c) {}
+
+  void update_a_grad() override {
+    a->grad->data += c_grad->data * (1.0 / b->data);
+  }
+
+  void update_b_grad() override {
+    b->grad->data += c_grad->data * (-a->data/(b->data*b->data));
+  }
+
+  ~DivBackward() {
+
+  }
+};
+
+_Float& operator/(_Float &a, _Float &b) {
+  try {
+    a.increase_grad_depend_count();
+    b.increase_grad_depend_count();
+    if (b.data == 0) {
+      string info = "_Float division error: divided by zero\n";
+      throw info;
+    }
+    _Float *c = new _Float(a.data/b.data);
+    DivBackward * div_op = new DivBackward(&a, &b, c);
+    c->grad->grad_op = (GradOp*)div_op;
+    return *c;
+  }
+  catch(string info) {
+    cout << info << "\n";
+  }
+}
+
 class UnaryOp : GradOp {
 public:
   // input

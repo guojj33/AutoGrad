@@ -56,6 +56,7 @@ public:
   friend Float operator+(const Float &a, const Float &b);
   friend Float operator-(const Float &a, const Float &b);
   friend Float operator*(const Float &a, const Float &b);
+  friend Float operator/(const Float &a, const Float &b);
   friend Float sigmoid(const Float &x);
   friend Float pow(const Float &x, float a);
 };
@@ -72,6 +73,11 @@ Float operator-(const Float &a, const Float &b) {
 
 Float operator*(const Float &a, const Float &b) {
   _Float *c_data = &((*a.data)*(*b.data));
+  return Float(c_data);
+}
+
+Float operator/(const Float &a, const Float &b) {
+  _Float *c_data = &((*a.data) / *(b.data));
   return Float(c_data);
 }
 
