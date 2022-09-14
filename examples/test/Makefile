@@ -1,17 +1,16 @@
 CXX := g++
 
-HEADER_DIR := ./include
+HEADER_DIR := ../../include
 BIN_DIR := ./bin
-SRC_DIR := ./src
 
 INCLUDE := -I $(HEADER_DIR)
 
-all : bin autograd.out
+all : bin test.out
 
 bin :
 	@mkdir -p $(BIN_DIR)
 
-autograd.out : $(SRC_DIR)/main.cpp
+test.out : test.cpp
 	$(CXX) $(INCLUDE) $^ -o $(BIN_DIR)/$@
 
 clean :

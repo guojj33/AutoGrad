@@ -73,8 +73,9 @@ public:
   bool stop_grad = false;
 
   _Float(bool stop_grad=false) {
-    grad = new GradVar();
     this->stop_grad = stop_grad;
+    if (!stop_grad)
+      grad = new GradVar();
     //cout << typeid(*this).name() << " " << this << " is being created with _Float().\n";
   }
 
@@ -139,6 +140,9 @@ public:
   friend _Float& operator*(_Float &a, _Float &b);
   friend _Float& sigmoid(_Float &x);
   friend _Float& pow(_Float &x, float a);
+  friend _Float& ReLU(_Float &x);
+  friend _Float& LogSigmoid(_Float& x);
+  friend _Float& operator-(_Float &x); // 重载负号
 };
 
 queue<_Float *> global__Float_to_delete;
@@ -369,7 +373,7 @@ public:
   }
 
   void update_x_grad() override {
-    x->grad->data += a*pow(x->data, a-1);
+    x->grad->data += y->grad->data * a*pow(x->data, a-1);
   }
 
   ~PowBackward() {
@@ -383,6 +387,80 @@ _Float& pow(_Float &x, float a) {
   _Float * y = new _Float(y_data);
   PowBackward * pow_op = new PowBackward(&x, y, a);
   y->grad->grad_op = (GradOp*)pow_op;
+  return *y;
+}
+
+class ReLUBackward: UnaryOp {
+/* y = max(0, x) */
+public:
+  ReLUBackward(_Float *x, _Float *y) : UnaryOp(x, y) {}
+
+  void update_x_grad() override {
+    if (x->data > 0) {
+      x->grad->data += y->grad->data * 1;
+    }
+    else if (x->data <= 0) {
+      x->grad->data += 0;
+    }
+  }
+
+  ~ReLUBackward() {
+
+  }
+};
+
+_Float& ReLU(_Float &x) {
+  x.increase_grad_depend_count();
+  float y_data = x.data > 0 ? x.data : 0;
+  _Float *y = new _Float(y_data);
+  ReLUBackward * relu_op = new ReLUBackward(&x, y);
+  y->grad->grad_op = (GradOp*)relu_op;
+  return *y;
+}
+
+class LogSigmoidBackward: UnaryOp {
+/* y = log sigmoid(x) */
+public:
+  LogSigmoidBackward(_Float *x, _Float *y) : UnaryOp(x, y) {}
+
+  void update_x_grad() override {
+    x->grad->data += y->grad->data * ( 1.0 / ( exp(x->data) + 1.0 ) );
+  }
+
+  ~LogSigmoidBackward() {
+    
+  }
+};
+
+_Float& LogSigmoid(_Float& x) {
+  x.increase_grad_depend_count();
+  float y_data = x.data - log(exp(x.data)+1.0);
+  _Float *y = new _Float(y_data);
+  LogSigmoidBackward * ls_op = new LogSigmoidBackward(&x, y);
+  y->grad->grad_op = (GradOp*)ls_op;
+  return *y;
+}
+
+class NegBackward: UnaryOp {
+/* y = -x */
+public:
+  NegBackward(_Float *x, _Float *y) : UnaryOp(x, y) {}
+
+  void update_x_grad() override {
+    x->grad->data += y->grad->data * (-1);
+  }
+
+  ~NegBackward() {
+
+  }
+};
+
+_Float& operator-(_Float& x) {
+  x.increase_grad_depend_count();
+  float y_data = -x.data;
+  _Float *y = new _Float(y_data);
+  NegBackward * neg_op = new NegBackward(&x, y);
+  y->grad->grad_op = (GradOp*)neg_op;
   return *y;
 }
 

@@ -104,3 +104,127 @@ void test4() {
   max1.printMat();
   max1.clear();
 }
+
+// pow测试
+void test5() {
+  Float x(2);
+  Float y = pow(x, 3);
+  Float w(3);
+  Float l = w*y; // l = 3*(x^3)
+  l.backward();
+  x.printGradient(); // 36
+}
+
+// relu测试
+void test6() {
+  Float x(2);
+  Float w(3);
+  Float y = w*x; // y = 3*x
+  Float l = ReLU(y); // l = max(0, 3*x)
+  l.backward();
+  x.printGradient(); // 3
+}
+
+void test7() {
+  Mat x(2,1);
+  x.set(0, 0, 2);
+  x.set(1, 0, -1);
+  Mat y = ReLU(x*2);
+  y.printMat();
+  y.backward();
+  x.printGradient();
+}
+
+void test8() {
+  Mat mat1(2,2,true,2);
+  Mat mat2(1,2,true,1);
+  mat2.set(0,0,0.5);
+  Mat mat3 = mat1 + mat2;
+  mat3.printMat();
+  mat3.backward();
+  mat1.clear();
+  mat2.clear();
+}
+
+// logsigmoid test
+void test9() {
+  Mat mat1(1,2,false,1);
+  mat1.set(0,0,0.5);
+  Mat mat2 = LogSigmoid(mat1);
+  mat1.printMat();
+  mat2.printMat();
+  mat2.backward();
+  mat1.printGradient();
+  mat1.clear();
+}
+
+// negative test
+void test10() {
+  Mat mat1(1,2,false,4);
+  Mat mat2 = -mat1*2;
+  mat2.printMat();
+  mat2.backward();
+  mat1.printGradient();
+  mat1.clear();
+}
+
+// sum test
+void test11() {
+  Mat mat1(2,2,false,4);
+  mat1.set(0,0,1);
+  mat1.printMat();
+  Mat mat2 = sum(mat1, 1);
+  mat2.printMat();
+  mat2.backward();
+  mat1.printGradient();
+  mat1.clear();
+}
+
+#include <random>
+void test12() {
+  default_random_engine gen;
+  normal_distribution<float> dist(5, 4); // mean std_deviaiton
+
+  int features = 1;
+  int batch = 1000;
+  Mat x(batch, features, false, 1);
+  for (int i = 0; i < batch; ++i) {
+    x.set(i, 0, dist(gen));
+  }
+  // x.printMat();
+  float momentum = 0;
+  Mat::BatchNorm bn(features, momentum);
+  // x.printMat();
+  Mat y = bn(x, 0);
+  // y.printMat();
+  float m = bn.running_means->at(0,0);
+  float v = bn.running_vars->at(0, 0);
+  cout << m << " " << v << "\n"; // 5.12411 16.916
+  Mat:: BatchNorm bn1(features, momentum);
+  Mat y1 = bn(y, 0);
+  
+  m = bn.running_means->at(0,0);
+  v = bn.running_vars->at(0, 0);
+  cout << m << " " << v << "\n"; // 0 1
+
+  y.backward();
+  y1.clear();
+  x.clear();
+  bn.clear();
+  bn1.clear();
+}
+
+int main() {
+  // test1();
+  // test2();
+  // test3();
+  // test4();
+  // test5();
+  // test6();
+  // test7();
+  // test8();
+  // test9();
+  // test10();
+  // test11();
+  test12();
+}

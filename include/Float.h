@@ -59,6 +59,9 @@ public:
   friend Float operator/(const Float &a, const Float &b);
   friend Float sigmoid(const Float &x);
   friend Float pow(const Float &x, float a);
+  friend Float ReLU(const Float &x);
+  friend Float LogSigmoid(const Float &x);
+  friend Float operator-(const Float &x);
 };
 
 Float operator+(const Float &a, const Float &b) {
@@ -88,6 +91,21 @@ Float sigmoid(const Float &x) {
 
 Float pow(const Float &x, float a) {
   _Float *y_data = &(pow(*x.data, a));
+  return Float(y_data);
+}
+
+Float ReLU(const Float &x) {
+  _Float *y_data = &(ReLU(*x.data));
+  return Float(y_data);
+}
+
+Float LogSigmoid(const Float &x) {
+  _Float *y_data = &(LogSigmoid(*x.data));
+  return Float(y_data);
+}
+
+Float operator-(const Float& x) {
+  _Float *y_data = &(-(*x.data));
   return Float(y_data);
 }
 

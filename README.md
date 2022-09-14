@@ -2,12 +2,20 @@
 
 仿写一个[自动微分机](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/advanced/autograd_cn.html)，数据结构与下图相似
 
+玩具示例，功能非常有限，有内存泄漏
+
 ![](./assets/autograd.png)
 
 ## 1. 运行
 
+环境 Ubuntu 20.04
+
+Boston房价预测
+
 ```
-make && ./bin/autograd.out
+cd ./examples/Boston
+make && ./bin/ExampleBoston.out
+python ./plot.py
 ```
 
 ## 2. 基本原理
@@ -30,11 +38,11 @@ a加b等于c，c再经过某些计算得到l，假设已知l对c的偏导数，�
 
 当我们发现一个OP相关的梯度可以计算时，就将这个OP添加到一个全局队列中，反向传播的过程就是不断从这个队列的头部取OP进行计算，直至队列为空。
 
-![](./assets/example.png)
+![](./assets/example-graph.png)
 
 ## 3. 基于线性回归的波士顿房价预测任务
 
-in `src/main.cpp`
+in `examples/Boston/ExampleBoston.cpp`
 
 ```C++
 // 计算误差
@@ -54,8 +62,8 @@ b.update(lr_rate);
 
 训练损失
 
-![](./assets/train_loss.png)
+![](./assets/boston/boston-train_loss.png)
 
 测试结果
 
-![](./assets/test.png)
+![](./assets/boston/boston-test.png)
