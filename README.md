@@ -83,6 +83,17 @@ $$Logits(x;W,c,w,b) = w^T\textnormal{sigmoid}(W^Tx+c)+b$$
 
 $$Prob_{y=0} = \textnormal{sigmoid}(Logits(x))$$
 
+
+```C++
+// 计算误差
+Mat X_norm = bn0(X, 0);
+Mat h = sigmoid(X_norm*W+c.transpose()); // ([4,2]*[2,2] + [1,2]) = [4,2]
+Mat h_norm = bn1(h, 0); // [4,2]
+Mat y_pred = h_norm*w + b.transpose(); // [4,2]*[2,1] + [1,1] = [4,1]
+Mat loss = BCEWithLogitsLoss(y_pred, Y, ones); // [1,1]
+Mat mean_loss = loss / num;
+```
+
 训练损失
 
 ![](./assets/xor/train_loss.png)
