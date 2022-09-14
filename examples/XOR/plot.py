@@ -7,7 +7,8 @@ output_dir = './output/'
 train_loss = pd.read_csv(output_dir + 'train_loss.txt', header=None).to_numpy()
 x = range(train_loss.shape[0])
 plt.plot(x, train_loss)
-plt.title('train losses')
+title = 'train losses'
+plt.title(title)
 plt.xlabel("epoch")
 plt.ylabel("BCE loss")
-plt.savefig(output_dir + 'train_loss.png')
+plt.savefig(output_dir + title + '.png')

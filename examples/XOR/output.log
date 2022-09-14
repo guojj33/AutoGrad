@@ -1,5 +1,5 @@
-3Mat 0x7ffcdddd18f0 is being created.
-3Mat 0x7ffcdddd1910 is being created.
+3Mat 0x7ffcdfcff6a0 is being created.
+3Mat 0x7ffcdfcff6c0 is being created.
 [[0,0],
 [0,1],
 [1,0],
@@ -8,18 +8,18 @@
 [1],
 [1],
 [0]], shape=(4, 1)
-3Mat 0x7ffcdddd1930 is being created.
-3Mat 0x7ffcdddd1950 is being created.
-3Mat 0x7ffcdddd1970 is being created.
-3Mat 0x7ffcdddd1990 is being created.
-3Mat 0x5589ff52ab00 is being created.
-3Mat 0x5589ff52abf0 is being created.
-3Mat 0x5589ff52ace0 is being created.
-3Mat 0x5589ff52ad90 is being created.
-3Mat 0x5589ff52ae40 is being created.
-3Mat 0x5589ff52af30 is being created.
-3Mat 0x5589ff52b020 is being created.
-3Mat 0x5589ff52b0d0 is being created.
+3Mat 0x7ffcdfcff6e0 is being created.
+3Mat 0x7ffcdfcff700 is being created.
+3Mat 0x7ffcdfcff720 is being created.
+3Mat 0x7ffcdfcff740 is being created.
+3Mat 0x55d228b05b00 is being created.
+3Mat 0x55d228b05bf0 is being created.
+3Mat 0x55d228b05ce0 is being created.
+3Mat 0x55d228b05d90 is being created.
+3Mat 0x55d228b05e40 is being created.
+3Mat 0x55d228b05f30 is being created.
+3Mat 0x55d228b06020 is being created.
+3Mat 0x55d228b060d0 is being created.
 [[0.840188,0.394383],
 [0.783099,0.79844]], shape=(2, 2)
 [[0.911647],
@@ -27,8 +27,8 @@
 [[0.335223],
 [0.76823]], shape=(2, 1)
 [[0.277775]], shape=(1, 1)
-3Mat 0x7ffcdddd19b0 is being created.
-3Mat 0x7ffcdddd19d0 is being created.
+3Mat 0x7ffcdfcff760 is being created.
+3Mat 0x7ffcdfcff780 is being created.
 
 EPOCH 1/1000:
 loss:
@@ -9029,7 +9029,10 @@ y_pred:
 [13.4668],
 [13.4668],
 [-27.622]], shape=(4, 1)
-异号: 115, 同号: 8876bn0:
+
+异号: 115, 同号: 8876
+
+bn0:
   means:
 [[0,0]], shape=(1, 2)
  vars:

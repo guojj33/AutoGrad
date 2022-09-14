@@ -1,11 +1,25 @@
 #include "Mat.h"
 #include "Optim.h"
 #include <fstream>
+#include <random>
+#include "time.h"
 
-void randInit(Mat& mat) {
+void uniformInit0(Mat& mat) {
   for (int i = 0; i < mat.shape()[0]; ++i) {
     for (int j = 0; j < mat.shape()[1]; ++j) {
       mat.set(i, j, rand() / double(RAND_MAX));
+    }
+  }
+}
+
+default_random_engine eng;
+
+void uniformInit(Mat& mat, int input_dim) {
+  float bound_abs = sqrt(1.0/input_dim);
+  uniform_real_distribution<float> dis(-bound_abs, bound_abs);
+  for (int i = 0; i < mat.shape()[0]; ++i) {
+    for (int j = 0; j < mat.shape()[1]; ++j) {
+      mat.set(i, j, dis(eng));
     }
   }
 }
@@ -34,6 +48,7 @@ int main() {
   Mat c(hidden_dim, 1, false);
   Mat w(hidden_dim, output_dim, false);
   Mat b(output_dim, 1, false);
+  
   Mat::BatchNorm bn0(input_dim, 0);
   Mat::BatchNorm bn1(hidden_dim, 0);
 
@@ -42,9 +57,19 @@ int main() {
   params.push_back(c);
   params.push_back(w);
   params.push_back(b);
-  for (int i = 0; i < params.size(); ++i) {
-    randInit(params[i]);
-    params[i].printMat();
+
+  bool do_uniform_init = false;
+  if (do_uniform_init) {
+    uniformInit(W, input_dim);
+    uniformInit(c, input_dim);
+    uniformInit(w, hidden_dim);
+    uniformInit(b, hidden_dim);
+  }
+  else {
+    for (int i = 0; i < params.size(); ++i) {
+      uniformInit0(params[i]);
+      params[i].printMat();
+    }
   }
   // params.push_back(*bn0.gammas);
   // params.push_back(*bn0.betas);
@@ -98,7 +123,7 @@ int main() {
     optimizer.step();
   }
   
-  printf("异号: %d, 同号: %d", optimizer.tmpCount1, optimizer.tmpCount2);
+  printf("\n异号: %d, 同号: %d\n\n", optimizer.tmpCount1, optimizer.tmpCount2);
   fstream fout("./output/train_loss.txt", ios::out);
   for (int i = 0; i < trainLoss.size(); ++i) {
     fout << trainLoss[i] << "\n";
