@@ -34,6 +34,8 @@ int main() {
   Mat c(hidden_dim, 1, false);
   Mat w(hidden_dim, output_dim, false);
   Mat b(output_dim, 1, false);
+  Mat::BatchNorm bn0(input_dim, 1.0);
+  Mat::BatchNorm bn1(hidden_dim, 1.0);
 
   vector<Mat> params;
   params.push_back(W);
@@ -44,6 +46,10 @@ int main() {
     randInit(params[i]);
     params[i].printMat();
   }
+  // params.push_back(*bn0.gammas);
+  // params.push_back(*bn0.betas);
+  // params.push_back(*bn1.gammas);
+  // params.push_back(*bn1.betas);
 
   /*
   可行配置1：
@@ -61,6 +67,9 @@ int main() {
   lr = 0.001
   momentum = 0.9
   不需手动改lr
+  
+  make
+  ./bin/ExampleXOR.out > output.log & python plot.py 
   */
 
   float lr = 0.001;
@@ -74,8 +83,6 @@ int main() {
   // 手动定义是为了最后能手动释放空间
   Mat ones(count, 1, true, 1); // 与Y的维度相同，用于参与BCEWithLogitsoss的计算
   Mat num(1, 1, true, count); // 作为分子，计算损失的平均
-  Mat::BatchNorm bn0(input_dim, 1.0);
-  Mat::BatchNorm bn1(hidden_dim, 1.0);
 
   for (int e = 0; e < epoch; ++e) {
     Mat X_norm = bn0(X, 0);
@@ -105,6 +112,36 @@ int main() {
     fout << trainLoss[i] << "\n";
   }
   fout.close();
+
+  // 打印网络参数
+  cout << "bn0:\n";
+  cout << "  means:\n";
+  bn0.running_means->printMat();
+  cout << " vars:\n";
+  bn0.running_vars->printMat();
+  cout << " gammas:\n";
+  bn0.gammas->printMat();
+  cout << " betas:\n";
+  bn0.betas->printMat();
+
+  cout << "bn1:\n";
+  cout << "  means:\n";
+  bn1.running_means->printMat();
+  cout << " vars:\n";
+  bn1.running_vars->printMat();
+  cout << " gammas:\n";
+  bn1.gammas->printMat();
+  cout << " betas:\n";
+  bn1.betas->printMat();
+
+  cout << "W:\n";
+  W.printMat();
+  cout << "c:\n";
+  c.printMat();
+  cout << "w:\n";
+  w.printMat();
+  cout << "b:\n";
+  b.printMat();
 
   X.clear();
   Y.clear();

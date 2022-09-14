@@ -1,5 +1,5 @@
-3Mat 0x7ffee49eae20 is being created.
-3Mat 0x7ffee49eae40 is being created.
+3Mat 0x7fff6f36aaf0 is being created.
+3Mat 0x7fff6f36ab10 is being created.
 [[0,0],
 [0,1],
 [1,0],
@@ -8,10 +8,18 @@
 [1],
 [1],
 [0]], shape=(4, 1)
-3Mat 0x7ffee49eae60 is being created.
-3Mat 0x7ffee49eae80 is being created.
-3Mat 0x7ffee49eaea0 is being created.
-3Mat 0x7ffee49eaec0 is being created.
+3Mat 0x7fff6f36ab30 is being created.
+3Mat 0x7fff6f36ab50 is being created.
+3Mat 0x7fff6f36ab70 is being created.
+3Mat 0x7fff6f36ab90 is being created.
+3Mat 0x5597d81a1b00 is being created.
+3Mat 0x5597d81a1bf0 is being created.
+3Mat 0x5597d81a1ce0 is being created.
+3Mat 0x5597d81a1d90 is being created.
+3Mat 0x5597d81a1e40 is being created.
+3Mat 0x5597d81a1f30 is being created.
+3Mat 0x5597d81a2020 is being created.
+3Mat 0x5597d81a20d0 is being created.
 [[0.840188,0.394383],
 [0.783099,0.79844]], shape=(2, 2)
 [[0.911647],
@@ -19,16 +27,8 @@
 [[0.335223],
 [0.76823]], shape=(2, 1)
 [[0.277775]], shape=(1, 1)
-3Mat 0x7ffee49eaee0 is being created.
-3Mat 0x7ffee49eaf00 is being created.
-3Mat 0x55b29cae6b00 is being created.
-3Mat 0x55b29cae7400 is being created.
-3Mat 0x55b29cae74f0 is being created.
-3Mat 0x55b29cae75a0 is being created.
-3Mat 0x55b29cae7650 is being created.
-3Mat 0x55b29cae7740 is being created.
-3Mat 0x55b29cae7830 is being created.
-3Mat 0x55b29cae78e0 is being created.
+3Mat 0x7fff6f36abb0 is being created.
+3Mat 0x7fff6f36abd0 is being created.
 
 EPOCH 1/2000:
 loss:
@@ -18029,4 +18029,32 @@ y_pred:
 [38.2658],
 [38.2658],
 [-92.4718]], shape=(4, 1)
-异号: 115, 同号: 17876
+异号: 115, 同号: 17876bn0:
+  means:
+[[0,0]], shape=(1, 2)
+ vars:
+[[1,1]], shape=(1, 2)
+ gammas:
+[[1,1]], shape=(1, 2)
+ betas:
+[[0,0]], shape=(1, 2)
+bn1:
+  means:
+[[0,0]], shape=(1, 2)
+ vars:
+[[1,1]], shape=(1, 2)
+ gammas:
+[[1,1]], shape=(1, 2)
+ betas:
+[[0,0]], shape=(1, 2)
+W:
+[[108.96,-269.691],
+[109.911,-339.713]], shape=(2, 2)
+c:
+[[-149.589],
+[-163.39]], shape=(2, 1)
+w:
+[[-56.6499],
+[-54.4498]], shape=(2, 1)
+b:
+[[-25.8528]], shape=(1, 1)
