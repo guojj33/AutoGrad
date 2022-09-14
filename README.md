@@ -96,4 +96,13 @@ Mat mean_loss = loss / num;
 
 训练损失
 
-![](./assets/xor/train_loss.png)
+容易困在局部最优点，将所有点归为一类，达到0.5准确率
+
+结合了动量梯度下降和BatchNormalization来解决
+
+这里的BatchNormalization没有让gamma和beta为可学习
+
+|batchNorm\momentum|×|√|
+|:---:|:---:|:---:|
+|×|![](./assets/xor/train%20losses%20WITHOUT%20batchNorm%20or%20momentum.png)|![](./assets/xor/train%20losses%20WITH%20momentum.png)|
+|√|![](./assets/xor/train%20losses%20WITH%20batchNorm.png)|![](./assets/xor/train%20losses%20WITH%20batchNorm%20%2B%20momentum.png)|

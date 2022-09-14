@@ -214,6 +214,16 @@ void test12() {
   bn1.clear();
 }
 
+#include <random>
+#include "time.h"
+default_random_engine eng;
+void test13() {
+  uniform_real_distribution<float> dis(-1,1);
+  for (int i = 0; i < 10; ++i) {
+    cout << dis(eng) << "\n";
+  }
+}
+
 int main() {
   // test1();
   // test2();
@@ -226,5 +236,6 @@ int main() {
   // test9();
   // test10();
   // test11();
-  test12();
+  // test12();
+  test13();
 }

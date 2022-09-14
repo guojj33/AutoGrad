@@ -6,7 +6,7 @@
 class Momentum {
 public:
   vector<Mat> params;
-  vector< vector<vector<float>> > lastUpdate;
+  vector< vector<vector<float>> > lastUpdate; // 保存动量
   float lr;
   float miu;
   int t;
@@ -36,7 +36,7 @@ public:
             if (lastUpdate[i][r][c] * curGrad[r][c] < 0) { // 异号
               tmpCount1 += 1;
             }
-            else if (lastUpdate[i][r][c] * curGrad[r][c] > 0) {
+            else if (lastUpdate[i][r][c] * curGrad[r][c] > 0) { // 同号
               tmpCount2 += 1;
             }
             rdata.push_back(tmp);
