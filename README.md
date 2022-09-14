@@ -2,7 +2,7 @@
 
 仿写一个[自动微分机](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/advanced/autograd_cn.html)，数据结构与下图相似
 
-玩具示例，功能非常有限，有内存泄漏
+玩具示例，功能有限，存在内存泄漏未解决
 
 ![](./assets/autograd.png)
 
@@ -14,8 +14,15 @@ Boston房价预测
 
 ```
 cd ./examples/Boston
-make && ./bin/ExampleBoston.out
-python ./plot.py
+make
+./bin/ExampleBoston.out & python ./plot.py
+```
+
+XOR分类器
+```
+cd ./examples/XOR
+make
+./bin/ExampleXOR.out & python ./plot.py
 ```
 
 ## 2. 基本原理
@@ -67,3 +74,15 @@ b.update(lr_rate);
 测试结果
 
 ![](./assets/boston/boston-test.png)
+
+## 4. XOR 二分类任务
+
+网络结构
+
+$$Logits(x;W,c,w,b) = w^T\textnormal{sigmoid}(W^Tx+c)+b$$
+
+$$Prob_{y=0} = \textnormal{sigmoid}(Logits(x))$$
+
+训练损失
+
+![](./assets/xor/train_loss.png)
