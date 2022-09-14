@@ -34,8 +34,8 @@ int main() {
   Mat c(hidden_dim, 1, false);
   Mat w(hidden_dim, output_dim, false);
   Mat b(output_dim, 1, false);
-  Mat::BatchNorm bn0(input_dim, 1.0);
-  Mat::BatchNorm bn1(hidden_dim, 1.0);
+  Mat::BatchNorm bn0(input_dim, 0);
+  Mat::BatchNorm bn1(hidden_dim, 0);
 
   vector<Mat> params;
   params.push_back(W);
@@ -54,15 +54,7 @@ int main() {
   /*
   可行配置1：
   隐藏层sigmoid激活
-  隐藏层h归一化
-  epoch = 4000
-  lr = 0.00005
-  momentum = 0.9
-  在第1250次迭代lr乘0.1
-
-  可行配置2：
-  隐藏层sigmoid激活
-  输入层和隐藏层h都归一化
+  输入层和隐藏层h都归一化，不学习gamma和beta
   epoch = 2000
   lr = 0.001
   momentum = 0.9
@@ -77,7 +69,7 @@ int main() {
   Momentum optimizer(params, lr, momentum); // 可能实现错了
   optimizer.reset();
 
-  int epoch = 2000;
+  int epoch = 1000;
   vector<float> trainLoss;
 
   // 手动定义是为了最后能手动释放空间
