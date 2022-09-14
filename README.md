@@ -102,7 +102,7 @@ Mat mean_loss = loss / num;
 
 这里的BatchNormalization没有让gamma和beta为可学习
 
-|batchNorm\momentum|×|√|
+|norm\moment|×|√|
 |:---:|:---:|:---:|
 |×|![](./assets/xor/train%20losses%20WITHOUT%20batchNorm%20or%20momentum.png)|![](./assets/xor/train%20losses%20WITH%20momentum.png)|
 |√|![](./assets/xor/train%20losses%20WITH%20batchNorm.png)|![](./assets/xor/train%20losses%20WITH%20batchNorm%20%2B%20momentum.png)|
