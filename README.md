@@ -81,7 +81,9 @@ b.update(lr_rate);
 
 $$Logits(x;W,c,w,b) = w^T\textnormal{sigmoid}(W^Tx+c)+b$$
 
-$$Prob_{y=0} = \textnormal{sigmoid}(Logits(x))$$
+$$P_{y=1} = \textnormal{sigmoid}(Logits(x))$$
+
+$$BCELoss = - \sum_{x_i} \big [ y_{real} * \ln{P_{y=1}} + (1-y_{real}) * \ln({1-P_{y=1}}) \big ]$$
 
 
 ```C++
