@@ -32,7 +32,7 @@ public:
         for (int r = 0; r < row; ++r) {
           vector<float> rdata;
           for (int c = 0; c < col; ++c) {
-            float tmp = miu*lastUpdate[i][r][c] + (1-miu)*curGrad[r][c];
+            float tmp = -miu*lastUpdate[i][r][c] + curGrad[r][c];
             if (lastUpdate[i][r][c] * curGrad[r][c] < 0) { // 异号
               tmpCount1 += 1;
             }

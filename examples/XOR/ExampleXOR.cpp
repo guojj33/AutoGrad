@@ -73,13 +73,13 @@ int main() {
   }
   // params.push_back(*bn0.gammas);
   // params.push_back(*bn0.betas);
-  // params.push_back(*bn1.gammas);
-  // params.push_back(*bn1.betas);
+  params.push_back(*bn1.gammas);
+  params.push_back(*bn1.betas);
 
   /*
   可行配置1：
   隐藏层sigmoid激活
-  输入层和隐藏层h都归一化，不学习gamma和beta
+  输入层和隐藏层h都归一化
   epoch = 2000
   lr = 0.001
   momentum = 0.9
@@ -90,8 +90,8 @@ int main() {
   */
 
   float lr = 0.001;
-  float momentum = 0.9;
-  Momentum optimizer(params, lr, momentum); // 可能实现错了
+  float momentum = 0;
+  Momentum optimizer(params, lr, momentum); // 可能实现错了，暂时不启用
   optimizer.reset();
 
   int epoch = 1000;
@@ -103,8 +103,8 @@ int main() {
 
   for (int e = 0; e < epoch; ++e) {
     Mat X_norm = bn0(X, 0);
-    Mat v = (X_norm*W+c.transpose());
-    Mat h = sigmoid(v); // ([4,2]*[2,2] + [1,2]) = [4,2]
+    Mat v = (X_norm*W+c.transpose()); // ([4,2]*[2,2] + [1,2]) = [4,2]
+    Mat h = sigmoid(v);
     Mat h_norm = bn1(h, 0); // [4,2]
     Mat y_pred = h_norm*w + b.transpose(); // [4,2]*[2,1] + [1,1] = [4,1]
     Mat loss = BCEWithLogitsLoss(y_pred, Y, ones); // [1,1]
@@ -118,6 +118,8 @@ int main() {
         v.printMat();
         printf("h:\n");
         h.printMat();
+        printf("h_norm:\n");
+        h_norm.printMat();
         printf("loss:\n");
         mean_loss.printMat();
         printf("y_pred:\n");
@@ -125,6 +127,8 @@ int main() {
     }
 
     mean_loss.backward();
+    bn0.clear_tmp_means_vars();
+    bn1.clear_tmp_means_vars();
     optimizer.step();
   }
   

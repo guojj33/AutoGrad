@@ -258,6 +258,10 @@ public:
     Mat* running_means; // [1, features] 均值
     Mat* running_vars; // [1, features] 方差
 
+    // 每一次前向运算都不同，反向传播完后要清除
+    vector<_Float*> tmp_means;
+    vector<_Float*> tmp_vars;
+
     BatchNorm(int features, float momentum=0.9) { // 作用的数据是features维
       betas = new Mat(1, features, false, 0);
       gammas = new Mat(1, features, false, 1);
@@ -272,6 +276,13 @@ public:
       if (x.col != features)
         throw -1;
       int batch = x.row;
+      
+      Mat x_norm; // 未分配数据
+      x_norm.row = batch;
+      x_norm.col = features;
+
+      tmp_means.clear();
+      tmp_vars.clear();
       if (mode == 0) { // 训练阶段
         for (int f = 0; f < features; ++f) {
           float tmp_mean = 0;
@@ -287,27 +298,37 @@ public:
           tmp_var /= batch;
 
           // 利用batch均值方差做归一化normalize
-          for (int b = 0; b < batch; ++b) {
-            x.data[b][f]->data = (x.at(b, f) - tmp_mean) / sqrt(tmp_var + eps);
-          }
+          // for (int b = 0; b < batch; ++b) {
+          //   x.data[b][f]->data = (x.at(b, f) - tmp_mean) / sqrt(tmp_var + eps);
+          // }
+          tmp_means.push_back(new _Float(tmp_mean, true));
+          tmp_vars.push_back(new _Float(sqrt(tmp_var + eps), true)); // 注意存了整个分母
           
           //计算 running_means和running_vars 供测试用
           running_means->set(0, f, miu*running_means->at(0, f) + (1-miu)*tmp_mean);
           running_vars->set(0, f, miu*running_vars->at(0, f) + (1-miu)*tmp_var);
         }
-        // scale and shift
-        Mat y = Hadamard(x, (*gammas)) + (*betas); // H([batch, features], [1, features]) + [1, features]
-        return y;
-      }
-      else if (mode == 1) { // 测试阶段
-        for (int f = 0; f < features; ++f) {
-          for (int b = 0; b < batch; ++b) {
-            x.data[b][f]->data = (x.at(b, f) - running_means->at(0, f)) / sqrt(running_vars->at(0, f) + eps);
+        for (int i = 0; i < batch; ++i) {
+          vector<_Float*> rdata;
+          for (int j = 0; j < features; ++j) {
+            _Float *p = &((*x.data[i][j] - *tmp_means[j]) / *(tmp_vars[j]));
+            rdata.push_back(p);
           }
+          x_norm.data.push_back(rdata);
         }
-        Mat y = Hadamard(x, (*gammas)) + (*betas);
+        // scale and shift
+        Mat y = Hadamard(x_norm, (*gammas)) + (*betas); // H([batch, features], [1, features]) + [1, features]
         return y;
       }
+      // else if (mode == 1) { // 测试阶段
+      //   for (int f = 0; f < features; ++f) {
+      //     for (int b = 0; b < batch; ++b) {
+      //       x.data[b][f]->data = (x.at(b, f) - running_means->at(0, f)) / sqrt(running_vars->at(0, f) + eps);
+      //     }
+      //   }
+      //   Mat y = Hadamard(x, (*gammas)) + (*betas);
+      //   return y;
+      // }
       else {
         string info = "BatchNorm: mode not implemented.";
         throw info;
@@ -321,6 +342,16 @@ public:
       delete betas;
       gammas = nullptr;
       betas = nullptr;
+    }
+
+    // 反向传播后调用，否则内存泄漏
+    void clear_tmp_means_vars() {
+      for (int i = 0; i < tmp_means.size(); ++i) {
+        delete tmp_means[i];
+        delete tmp_vars[i];
+      }
+      tmp_means.clear();
+      tmp_vars.clear();
     }
 
     ~BatchNorm() {
@@ -413,6 +444,7 @@ Mat Hadamard(const Mat& mat1, const Mat& mat2) { // 对应元素相乘
     return Hadamard(mat1.transpose(), mat2.transpose()).transpose(); // -> [col, row] and [col, 1] = [col, row] -> [row, col]
   }
   else {
+    cout << "erro\n";
     string info = "Hadamard(mat1, mat2): incompatible dimensions";
     throw info;
   }
