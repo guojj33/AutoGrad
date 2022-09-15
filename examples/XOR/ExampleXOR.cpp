@@ -103,7 +103,8 @@ int main() {
 
   for (int e = 0; e < epoch; ++e) {
     Mat X_norm = bn0(X, 0);
-    Mat h = sigmoid(X_norm*W+c.transpose()); // ([4,2]*[2,2] + [1,2]) = [4,2]
+    Mat v = (X_norm*W+c.transpose());
+    Mat h = sigmoid(v); // ([4,2]*[2,2] + [1,2]) = [4,2]
     Mat h_norm = bn1(h, 0); // [4,2]
     Mat y_pred = h_norm*w + b.transpose(); // [4,2]*[2,1] + [1,1] = [4,1]
     Mat loss = BCEWithLogitsLoss(y_pred, Y, ones); // [1,1]
@@ -111,8 +112,12 @@ int main() {
     float loss_item = mean_loss.at(0, 0);
     trainLoss.push_back(loss_item);
     
-    if ((e+1) % 1 == 0) {
+    if ((e+1) % 100 == 0) {
         printf("\nEPOCH %d/%d:\n", e+1, epoch);
+        printf("v:\n");
+        v.printMat();
+        printf("h:\n");
+        h.printMat();
         printf("loss:\n");
         mean_loss.printMat();
         printf("y_pred:\n");
